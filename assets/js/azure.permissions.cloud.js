@@ -64,7 +64,18 @@ async function processReferencePage() {
 
     $('#actions-table tbody').html('');
 
-    services.sort((a, b) => a['displayName'].toLowerCase() < b['displayName'].toLowerCase() ? -1 : 1)
+    services.sort((a, b) => {
+        if (!a['displayName'] || a['displayName'] == "") {
+            a['displayName'] = a['name'];
+        }
+        if (!b['displayName'] || b['displayName'] == "") {
+            b['displayName'] = b['name'];
+        }
+        if (a['displayName'].toLowerCase() < b['displayName'].toLowerCase()) {
+            return -1;
+        }
+        return 1;
+    });
     
     if ($('#reference-list').html() == "") {
         for (let service_def of services) {
