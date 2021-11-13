@@ -288,6 +288,11 @@ async function processReferencePage() {
     for (let operation of operations) {
         var operationname_parts = operation['name'].split("/");
 
+        let displayName = operation['displayName'].split(". ")[0];
+        if (displayName.endsWith(".")) {
+            displayName = displayName.substring(0, displayName.length-1);
+        }
+
         let description = operation['description'].split(". ")[0];
         if (!description.endsWith(".")) {
             description += ".";
@@ -295,7 +300,7 @@ async function processReferencePage() {
         
         method_table_content += '<tr id="' + operation['name'] + '">\
             <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + '</td>\
-            <td class="tx-normal">' + operation['displayName'] + '</td>\
+            <td class="tx-normal">' + displayName + '</td>\
             <td class="tx-normal">' + description + '</td>\
             <td class="tx-medium">' + (operation['isDataAction'] ? "✓" : "") + '</td>\
         </tr>';
