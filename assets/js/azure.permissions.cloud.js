@@ -232,7 +232,11 @@ async function processReferencePage() {
         $('.display-api').attr('style', '');
     }
 
-    $('.servicename').html(service['service_name']);
+    if (!service['displayName'] || service['displayName'] == "") {
+        $('.servicename').html(service['name']);
+    } else {
+        $('.servicename').html(service['displayName']);
+    }
 
     $('.iam-link').click(() => {
         window.location.pathname = window.location.pathname.replace("/api/", "/iam/");
