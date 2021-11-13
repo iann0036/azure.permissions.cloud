@@ -255,30 +255,33 @@ async function processReferencePage() {
 
     let actions_table_content = '';
     let iam_count = 0;
-    /*
-    for (let privilege of service['privileges']) {
-        let access_class = "tx-success";
-        if (["Write", "Permissions management"].includes(privilege['access_level'])) {
-            access_class = "tx-pink";
-        }
-        if (["Unknown"].includes(privilege['access_level'])) {
-            access_class = "tx-color-03";
+    for (let operation of operations) {
+        var operationname_parts = operation['name'].split("/");
+
+        let displayName = operation['displayName'].split(". ")[0];
+        if (displayName.endsWith(".")) {
+            displayName = displayName.substring(0, displayName.length-1);
         }
 
-        if (privilege['description'].substr(privilege['description'].length-1) != "." && privilege['description'].length > 1) {
-            privilege['description'] += ".";
+        let description = operation['description'].split(". ")[0];
+        if (!description.endsWith(".")) {
+            description += ".";
+        }
+
+        let origins = operation['origin'].split(",");
+        for (let i=0; i<origins.length; i++) {
+            origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
         }
         
-        actions_table_content += '<tr id="' + service['prefix'] + '-' + privilege['privilege'] + '">\
-            <td class="tx-medium"><span class="tx-color-03">' + service['prefix'] + ':</span>' + privilege['privilege'] + (privilege['access_level'] == "Unknown" ? ' <span class="badge badge-danger">undocumented</span>' : '') + '</td>\
-            <td class="tx-normal">' + privilege['description'] + '</td>\
-            <td class="tx-medium">' + used_by + '</td>\
-            <td class="' + access_class + '">' + privilege['access_level'] + '</td>\
-            <td class="tx-medium">' + expand_resource_type(service, first_resource_type['resource_type']) + '</td>\
-            <td class="tx-medium">' + condition_keys.join("<br />") + '</td>\
+        actions_table_content += '<tr id="' + operation['name'] + '">\
+            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
+            <td class="tx-normal">' + displayName + '</td>\
+            <td class="tx-normal">' + description + '</td>\
+            <td class="tx-medium">' + origins.join(", ") + '</td>\
         </tr>';
+
+        iam_count += 1;
     }
-    */
     $('.iam-count').html(iam_count);
     $('#actions-table tbody').append(actions_table_content);
 
