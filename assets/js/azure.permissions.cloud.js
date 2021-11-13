@@ -82,15 +82,15 @@ async function processReferencePage() {
             if (window.location.pathname == "/iam/" + service_def['name']) {
                 service = service_def;
 
-                $('#reference-list').append('<li class="nav-item active"><a href="/iam/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item active"><a href="/iam/' + service_def['name'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             } else if (window.location.pathname == "/api/" + service_def['name']) {
                 service = service_def;
 
-                $('#reference-list').append('<li class="nav-item active"><a href="/api/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item active"><a href="/api/' + service_def['name'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             } else if (window.location.pathname.startsWith("/api/")) {
-                $('#reference-list').append('<li class="nav-item"><a href="/api/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item"><a href="/api/' + service_def['name'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             } else {
-                $('#reference-list').append('<li class="nav-item"><a href="/iam/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item"><a href="/iam/' + service_def['name'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             }
         }
     }
