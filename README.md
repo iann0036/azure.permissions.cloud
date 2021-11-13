@@ -1,2 +1,5 @@
 # azure.permissions.cloud
-[WORK IN PROGRESS] A crowdsourced Azure IAM permissions reference.
+
+![](/assets/img/screen1.png)
+
+Learn more at [https://azure.permissions.cloud/usage](https://azure.permissions.cloud/usage)
