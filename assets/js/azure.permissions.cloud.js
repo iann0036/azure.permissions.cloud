@@ -263,9 +263,12 @@ async function processReferencePage() {
             displayName = displayName.substring(0, displayName.length-1);
         }
 
-        let description = operation['description'].split(". ")[0];
-        if (!description.endsWith(".")) {
-            description += ".";
+        let description = "";
+        if (operation['description']) {
+            description = operation['description'].split(". ")[0];
+            if (!description.endsWith(".")) {
+                description += ".";
+            }
         }
 
         let origins = [];
@@ -299,9 +302,12 @@ async function processReferencePage() {
             displayName = displayName.substring(0, displayName.length-1);
         }
 
-        let description = operation['description'].split(". ")[0];
-        if (!description.endsWith(".")) {
-            description += ".";
+        let description = "";
+        if (operation['description']) {
+            description = operation['description'].split(". ")[0];
+            if (!description.endsWith(".")) {
+                description += ".";
+            }
         }
 
         let origins = [];
