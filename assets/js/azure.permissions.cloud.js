@@ -304,9 +304,12 @@ async function processReferencePage() {
             description += ".";
         }
 
-        let origins = operation['origin'].split(",");
-        for (let i=0; i<origins.length; i++) {
-            origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+        let origins = [];
+        if (operation['origin']) {
+            origins = operation['origin'].split(",");
+            for (let i=0; i<origins.length; i++) {
+                origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+            }
         }
         
         method_table_content += '<tr id="' + operation['name'] + '">\
