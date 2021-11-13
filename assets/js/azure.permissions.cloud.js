@@ -291,7 +291,7 @@ async function processReferencePage() {
         method_table_content += '<tr id="' + operation['name'] + '">\
             <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + '</td>\
             <td class="tx-normal">' + operation['displayName'] + '</td>\
-            <td class="tx-medium">' + operation['description'] + '</td>\
+            <td class="tx-normal">' + operation['description'] + '</td>\
             <td class="tx-medium">' + (operation['isDataAction'] ? "✓" : "") + '</td>\
         </tr>';
 
