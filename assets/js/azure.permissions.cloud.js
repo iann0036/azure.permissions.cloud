@@ -297,12 +297,17 @@ async function processReferencePage() {
         if (!description.endsWith(".")) {
             description += ".";
         }
+
+        let origins = operation['origin'].split(",");
+        for (let i=0; i<origins.length; i++) {
+            origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+        }
         
         method_table_content += '<tr id="' + operation['name'] + '">\
-            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + '</td>\
+            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
             <td class="tx-normal">' + displayName + '</td>\
             <td class="tx-normal">' + description + '</td>\
-            <td class="tx-medium">' + (operation['isDataAction'] ? "✓" : "") + '</td>\
+            <td class="tx-medium">' + origins.join(", ") + '</td>\
         </tr>';
 
         api_count += 1;
