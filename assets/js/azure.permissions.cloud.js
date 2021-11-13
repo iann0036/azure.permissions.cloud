@@ -58,35 +58,28 @@ function getQueryVariable(variable) {
 }
 
 async function processReferencePage() {
-    const iam_def_data = await fetch('https://iann0036.github.io/iam-dataset/iam_definition.json');
-    var iam_def = await iam_def_data.json();
-    const iam_def_duplicate = JSON.parse(JSON.stringify(iam_def));
-    let service = iam_def[0];
-
-    let sdk_map_data = await fetch('https://iann0036.github.io/iam-dataset/map.json');
-    let sdk_map = await sdk_map_data.json();
-
-    let docs_data = await fetch('https://iann0036.github.io/iam-dataset/docs.json');
-    let docs = await docs_data.json();
+    let services_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/provider-operations.json');
+    let services = await services_data.json();
+    let service = null;
 
     $('#actions-table tbody').html('');
 
-    iam_def.sort((a, b) => a['service_name'].replace("Amazon ", "").replace("AWS ", "") < b['service_name'].replace("Amazon ", "").replace("AWS ", "") ? -1 : 1)
+    services.sort((a, b) => a['displayName'].toLowerCase() < b['displayName'].toLowerCase() ? -1 : 1)
     
     if ($('#reference-list').html() == "") {
-        for (let service_def of iam_def) {
-            if (window.location.pathname == "/iam/" + service_def['prefix']) {
+        for (let service_def of services) {
+            if (window.location.pathname == "/iam/" + service_def['name']) {
                 service = service_def;
 
-                $('#reference-list').append('<li class="nav-item active"><a href="/iam/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['service_name'] + '</span></a></li>');
-            } else if (window.location.pathname == "/api/" + service_def['prefix']) {
+                $('#reference-list').append('<li class="nav-item active"><a href="/iam/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
+            } else if (window.location.pathname == "/api/" + service_def['name']) {
                 service = service_def;
 
-                $('#reference-list').append('<li class="nav-item active"><a href="/api/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['service_name'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item active"><a href="/api/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             } else if (window.location.pathname.startsWith("/api/")) {
-                $('#reference-list').append('<li class="nav-item"><a href="/api/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['service_name'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item"><a href="/api/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             } else {
-                $('#reference-list').append('<li class="nav-item"><a href="/iam/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['service_name'] + '</span></a></li>');
+                $('#reference-list').append('<li class="nav-item"><a href="/iam/' + service_def['prefix'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
             }
         }
     }
@@ -229,7 +222,6 @@ async function processReferencePage() {
     }
 
     $('.servicename').html(service['service_name']);
-    $('.iam-count').html(service['privileges'].length);
 
     $('.iam-link').click(() => {
         window.location.pathname = window.location.pathname.replace("/api/", "/iam/");
@@ -238,16 +230,18 @@ async function processReferencePage() {
         window.location.pathname = window.location.pathname.replace("/iam/", "/api/");
     });
 
-    let actions_table_content = '';
-    for (let privilege of service['privileges']) {
-        let first_resource_type = privilege['resource_types'].shift();
-
-        let condition_keys = [];
-        for (let condition_key of first_resource_type['condition_keys']) {
-            condition_keys.push('<a target="_blank" href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_' + service['service_name'].replace(/ /g, "").toLowerCase() + '.html#' + service['service_name'].replace(/ /g, "").toLowerCase() + '-policy-keys">' + condition_key + '</a>');
+    let operations = service['operations'];
+    for (let resource_type of service['resourceTypes']) {
+        for (let operation of resource_type['operations']) {
+            operation['resourceType'] = resource_type['name'];
+            operations.push(operation);
         }
+    }
 
-        let rowspan = privilege['resource_types'].length + 1;
+    let actions_table_content = '';
+    let iam_count = 0;
+    /*
+    for (let privilege of service['privileges']) {
         let access_class = "tx-success";
         if (["Write", "Permissions management"].includes(privilege['access_level'])) {
             access_class = "tx-pink";
@@ -256,91 +250,44 @@ async function processReferencePage() {
             access_class = "tx-color-03";
         }
 
-        let used_by = await getUsedBy(service['prefix'] + ':' + privilege['privilege'], sdk_map);
-
         if (privilege['description'].substr(privilege['description'].length-1) != "." && privilege['description'].length > 1) {
             privilege['description'] += ".";
         }
         
         actions_table_content += '<tr id="' + service['prefix'] + '-' + privilege['privilege'] + '">\
-            <td rowspan="' + rowspan + '" class="tx-medium"><span class="tx-color-03">' + service['prefix'] + ':</span>' + privilege['privilege'] + (privilege['access_level'] == "Unknown" ? ' <span class="badge badge-danger">undocumented</span>' : '') + '</td>\
-            <td rowspan="' + rowspan + '" class="tx-normal">' + privilege['description'] + '</td>\
-            <td rowspan="' + rowspan + '" class="tx-medium">' + used_by + '</td>\
-            <td rowspan="' + rowspan + '" class="' + access_class + '">' + privilege['access_level'] + '</td>\
+            <td class="tx-medium"><span class="tx-color-03">' + service['prefix'] + ':</span>' + privilege['privilege'] + (privilege['access_level'] == "Unknown" ? ' <span class="badge badge-danger">undocumented</span>' : '') + '</td>\
+            <td class="tx-normal">' + privilege['description'] + '</td>\
+            <td class="tx-medium">' + used_by + '</td>\
+            <td class="' + access_class + '">' + privilege['access_level'] + '</td>\
             <td class="tx-medium">' + expand_resource_type(service, first_resource_type['resource_type']) + '</td>\
             <td class="tx-medium">' + condition_keys.join("<br />") + '</td>\
         </tr>';
-
-        for (let resource_type of privilege['resource_types']) {
-            let condition_keys = [];
-            for (let condition_key of resource_type['condition_keys']) {
-                condition_keys.push('<a target="_blank" href="https://docs.aws.amazon.com/service-authorization/latest/reference/list_' + service['service_name'].replace(/ /g, "").toLowerCase() + '.html#' + service['service_name'].replace(/ /g, "").toLowerCase() + '-policy-keys">' + condition_key + '</a>');
-            }
-
-            actions_table_content += '<tr>\
-                <td class="tx-medium" style="padding-left: 10px !important;">' + expand_resource_type(service, resource_type['resource_type']) + '</td>\
-                <td class="tx-medium">' + condition_keys.join("<br />") + '</td>\
-            </tr>';
-        }
     }
+    */
+    $('.iam-count').html(iam_count);
     $('#actions-table tbody').append(actions_table_content);
 
-    // get primary
-    let api_prefixes = [];
-    for (let iam_mapping_name of Object.keys(sdk_map['sdk_method_iam_mappings']).sort()) {
-        let first_action = sdk_map['sdk_method_iam_mappings'][iam_mapping_name][0];
-
-        if (first_action['action'].split(":")[0] == service['prefix']) { // TODO: better matching
-            api_prefixes.push(iam_mapping_name.split(".")[0]);
-        }
-    }
-
+    // api
     let method_table_content = '';
     let api_count = 0;
-    for (let iam_mapping_name of Object.keys(sdk_map['sdk_method_iam_mappings']).sort()) {
-        let iam_mapping_name_parts = iam_mapping_name.split(".");
-        if (api_prefixes.includes(iam_mapping_name_parts[0])) {
-            let first_action = sdk_map['sdk_method_iam_mappings'][iam_mapping_name].shift();
+    for (let operation of operations) {
+        var operationname_parts = operation['name'].split("/");
+        
+        method_table_content += '<tr id="' + operation['name'] + '">\
+            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + '</td>\
+            <td class="tx-normal">' + operation['displayName'] + '</td>\
+            <td class="tx-medium">' + operation['description'] + '</td>\
+            <td class="tx-medium">' + (operation['isDataAction'] ? "✓" : "") + '</td>\
+        </tr>';
 
-            let rowspan = sdk_map['sdk_method_iam_mappings'][iam_mapping_name].length + 1;
-
-            let actionlink = "/iam/" + first_action['action'].split(":")[0] + "#" + first_action['action'].replace(":", "-");
-            let template = await getTemplates(first_action, iam_def_duplicate);
-            let undocumented = '';
-            if (first_action['undocumented']) {
-                undocumented = ' <span class="badge badge-danger">undocumented</span>';
-            }
-
-            method_table_content += '<tr id="' + iam_mapping_name_parts[0] + '_' + iam_mapping_name_parts[1] + '">\
-                <td rowspan="' + rowspan + '" class="tx-medium"><span class="tx-color-03">' + iam_mapping_name_parts[0] + '.</span>' + iam_mapping_name_parts[1] + '</td>\
-                <td rowspan="' + rowspan + '" class="tx-normal">' + shortDocs(iam_mapping_name, docs) + '</td>\
-                <td class="tx-medium"><a href="' + actionlink + '">' + first_action['action'] + undocumented + '</a></td>\
-                <td class="tx-medium">' + template + '</td>\
-            </tr>';
-
-            for (let action of sdk_map['sdk_method_iam_mappings'][iam_mapping_name]) {
-                let actionlink = "/iam/" + action['action'].split(":")[0] + "#" + action['action'].replace(":", "-");
-                let template = await getTemplates(action, iam_def_duplicate);
-                let undocumented = '';
-                if (action['undocumented']) {
-                    undocumented = ' <span class="badge badge-danger">undocumented</span>';
-                }
-
-                method_table_content += '<tr>\
-                    <td class="tx-medium" style="padding-left: 10px !important;"><a href="' + actionlink + '">' + action['action'] + undocumented + '</a></td>\
-                    <td class="tx-medium">' + template + '</td>\
-                </tr>';
-            }
-
-            api_count += 1;
-        }
+        api_count += 1;
     }
 
     $('.api-count').html(api_count.toString());
     $('#methods-table tbody').append(method_table_content);
 
     // managed policies
-
+    /*
     let managedpolicies_table_content = '';
     let managedpolicies_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/managed_policies.json');
     let managedpolicies = await managedpolicies_data.json();
@@ -391,6 +338,7 @@ async function processReferencePage() {
 
     $('.active-builtinroles-count').html(managedpolicies['policies'].length - deprecated_policy_count);
     $('.deprecated-builtinroles-count').html(deprecated_policy_count);
+    */
 
     $('[data-toggle="tooltip"]').tooltip();
 
