@@ -349,32 +349,18 @@ async function processReferencePage() {
             deprecated_policy_count += 1;
         }
 
-        for (let i=0; i<builtinrole['access_levels'].length; i++) {
-            let access_class = "tx-success";
-            if (["Write", "Permissions management"].includes(builtinrole['access_levels'][i])) {
-                access_class = "tx-pink";
-            }
-            if (["Unknown"].includes(builtinrole['access_levels'][i])) {
-                access_class = "tx-color-03";
-            }
-            builtinrole['access_levels'][i] = "<span class=\"" + access_class + "\">" + builtinrole['access_levels'][i] + "</span>";
-        }
-
         builtinroles_table_content += '<tr>\
-            <td class="tx-medium"><a href="/builtinroles/' + builtinrole['name'] + '">' + builtinrole['name'] + "</a>" + (builtinrole['resource_exposure'] ? ' <span class="badge badge-info">resource exposure</span>' : '') + (builtinrole['credentials_exposure'] ? ' <span class="badge badge-info">credentials exposure</span>' : '') + (builtinrole['unknown_actions'] ? ' <span class="badge badge-warning">unknown actions</span>' : '') + (builtinrole['privesc'] ? ' <span class="badge badge-warning">possible privesc</span>' : '') + (builtinrole['malformed'] ? ' <span class="badge badge-danger">malformed</span>' : '') + (builtinrole['deprecated'] ? ' <span class="badge badge-danger">deprecated</span>' : '') + (builtinrole['undocumented_actions'] ? ' <span class="badge badge-danger">undocumented actions</span>' : '') + '</td>\
-            <td class="tx-normal">' + builtinrole['access_levels'].join(", ") + '</td>\
-            <td class="tx-normal">' + builtinrole['version'] + '</td>\
-            <td class="tx-normal" style="text-decoration-line: underline; text-decoration-style: dotted;">' + readable_date(builtinrole['createdate']) + '</td>\
-            <td class="tx-normal" style="text-decoration-line: underline; text-decoration-style: dotted;">' + readable_date(builtinrole['updatedate']) + '</td>\
+            <td class="tx-medium"><a href="/builtinroles/' + builtinrole['name'] + '">' + builtinrole['name'] + "</a>" + (builtinrole['permittedActions'].length == 0 && builtinrole['permittedDataActions'].length == 0 ? ' <span class="badge badge-secondary">empty</span>' : '') + '</td>\
+            <td class="tx-normal">' + builtinrole['description'] + '</td>\
+            <td class="tx-normal">' + builtinrole['permittedActions'].length + '</td>\
+            <td class="tx-normal">' + builtinrole['permittedDataActions'].length + '</td>\
         </tr>';
 
         if (window.location.pathname.startsWith("/builtinroles/") && builtinrole['name'] == window.location.pathname.replace("/builtinroles/", "")) {
-            let policy = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/builtinroles/' + builtinrole['name'] + '.json');
-            let policy_data = await policy.json();
-            $('.builtinroleraw').html(Prism.highlight(JSON.stringify(policy_data['document'], null, 4), Prism.languages.javascript, 'javascript'));
+            $('.builtinroleraw').html(Prism.highlight(JSON.stringify(policy_data['builtinrole'], null, 4), Prism.languages.javascript, 'javascript'));
             $('.builtinrolename').html(builtinrole['name']);
-            processbuiltinrole(policy_data, iam_def);
-            $('#builtinrole-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/builtinroles/' + builtinrole['name'] + '.json');
+            //processbuiltinrole(policy_data, iam_def);
+            $('#builtinrole-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
         }
     }
 
