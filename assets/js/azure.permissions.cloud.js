@@ -600,7 +600,7 @@ async function processReferencePage() {
             clearTimeout(custom_policy_timer);
             custom_policy_timer = setTimeout(function () {
                 try {
-                    var custompolicy = JSON.parse($('.custompolicy').html());
+                    var custompolicy = JSON.parse($('.custompolicy').val());
 
                     processEffective([{
                         'actions': custompolicy['Actions'],
