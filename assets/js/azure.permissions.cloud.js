@@ -65,6 +65,7 @@ function processEffective(permissions, tableid, services) {
 
     for (let permission of permissions) {
         for (let action of permission['actions']) {
+            let matched = false;
             matchexpression = "^" + action.replaceAll(/\./g, "\\.").replaceAll(/\*/g, ".*").replaceAll(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
@@ -75,6 +76,7 @@ function processEffective(permissions, tableid, services) {
                             'based_on': action,
                             'origin': operation['origin']
                         });
+                        matched = true;
                     }
                 }
                 for (let resource_type of service['resourceTypes']) {
@@ -86,13 +88,21 @@ function processEffective(permissions, tableid, services) {
                                 'based_on': action,
                                 'origin': operation['origin']
                             });
+                            matched = true;
                         }
                     }
                 }
             }
+
+            if (!matched) {
+                permitted_actions.push({
+                    'based_on': action
+                });
+            }
         }
 
         for (let action of permission['dataActions']) {
+            let matched = false;
             matchexpression = "^" + action.replaceAll(/\./g, "\\.").replaceAll(/\*/g, ".*").replaceAll(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
@@ -103,6 +113,7 @@ function processEffective(permissions, tableid, services) {
                             'based_on': action,
                             'origin': operation['origin']
                         });
+                        matched = true;
                     }
                 }
                 for (let resource_type of service['resourceTypes']) {
@@ -114,19 +125,28 @@ function processEffective(permissions, tableid, services) {
                                 'based_on': action,
                                 'origin': operation['origin']
                             });
+                            matched = true;
                         }
                     }
                 }
             }
+            
+            if (!matched) {
+                permitted_data_actions.push({
+                    'based_on': action
+                });
+            }
         }
 
         for (let action of permission['notActions']) {
+            let matched = false;
             matchexpression = "^" + action.replaceAll(/\./g, "\\.").replaceAll(/\*/g, ".*").replaceAll(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
                     if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                         permitted_actions = permitted_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                        matched = true;
                     }
                 }
                 for (let resource_type of service['resourceTypes']) {
@@ -134,19 +154,28 @@ function processEffective(permissions, tableid, services) {
                         var re = new RegExp(matchexpression.toLowerCase());
                         if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                             permitted_actions = permitted_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                            matched = true;
                         }
                     }
                 }
             }
+            
+            if (!matched) {
+                permitted_actions.push({
+                    'based_on': "Not " + action
+                });
+            }
         }
 
         for (let action of permission['notDataActions']) {
+            let matched = false;
             matchexpression = "^" + action.replaceAll(/\./g, "\\.").replaceAll(/\*/g, ".*").replaceAll(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
                     if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                         permitted_data_actions = permitted_data_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                        matched = true;
                     }
                 }
                 for (let resource_type of service['resourceTypes']) {
@@ -154,49 +183,74 @@ function processEffective(permissions, tableid, services) {
                         var re = new RegExp(matchexpression.toLowerCase());
                         if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                             permitted_data_actions = permitted_data_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                            matched = true;
                         }
                     }
                 }
+            }
+            
+            if (!matched) {
+                permitted_data_actions.push({
+                    'based_on': "Not " + action
+                });
             }
         }
     }
 
     for (let action of permitted_actions) {
         var access_class = "tx-normal";
-        var action_name_parts = action['name'].split("/");
 
-        let origins = [];
-        if (action['origin']) {
-            origins = action['origin'].split(",");
-            for (let i = 0; i < origins.length; i++) {
-                origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+        if (action['name']) {
+            var action_name_parts = action['name'].split("/");
+
+            let origins = [];
+            if (action['origin']) {
+                origins = action['origin'].split(",");
+                for (let i = 0; i < origins.length; i++) {
+                    origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+                }
             }
-        }
 
-        table_content += '<tr>\
-            <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + '</td>\
-            <td class="tx-medium">' + action['based_on'] + '</td>\
-            <td class="tx-medium">' + origins.join(", ") + '</td>\
-        </tr>';
+            table_content += '<tr>\
+                <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + '</td>\
+                <td class="tx-medium">' + action['based_on'] + '</td>\
+                <td class="tx-medium">' + origins.join(", ") + '</td>\
+            </tr>';
+        } else {
+            table_content += '<tr>\
+                <td class="tx-medium"><span class="badge badge-warning">unknown action</span></td>\
+                <td class="tx-medium">' + action['based_on'] + '</td>\
+                <td class="tx-medium">-</td>\
+            </tr>';
+        }
     }
 
     for (let action of permitted_data_actions) {
         var access_class = "tx-normal";
-        var action_name_parts = action['name'].split("/");
 
-        let origins = [];
-        if (action['origin']) {
-            origins = action['origin'].split(",");
-            for (let i = 0; i < origins.length; i++) {
-                origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+        if (action['name']) {
+            var action_name_parts = action['name'].split("/");
+
+            let origins = [];
+            if (action['origin']) {
+                origins = action['origin'].split(",");
+                for (let i = 0; i < origins.length; i++) {
+                    origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+                }
             }
-        }
 
-        table_content += '<tr>\
-            <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + ' <span class="badge badge-primary">data action</span></td>\
-            <td class="tx-medium">' + action['based_on'] + '</td>\
-            <td class="tx-medium">' + origins.join(", ") + '</td>\
-        </tr>';
+            table_content += '<tr>\
+                <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + ' <span class="badge badge-primary">data action</span></td>\
+                <td class="tx-medium">' + action['based_on'] + '</td>\
+                <td class="tx-medium">' + origins.join(", ") + '</td>\
+            </tr>';
+        } else {
+            table_content += '<tr>\
+                <td class="tx-medium"><span class="badge badge-warning">unknown action</span> <span class="badge badge-primary">data action</span></td>\
+                <td class="tx-medium">' + action['based_on'] + '</td>\
+                <td class="tx-medium">-</td>\
+            </tr>';
+        }
     }
 
     tbody.html(table_content);
