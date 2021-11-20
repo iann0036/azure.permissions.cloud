@@ -125,7 +125,7 @@ function processEffective(permissions, tableid, services) {
         table_content += '<tr>\
             <td class="tx-medium">' + action['name'] + '</td>\
             <td class="tx-medium">' + action['based_on'] + '</td>\
-            <td class="' + access_class + '">' + "TBC" + '</td>\
+            <td class="' + access_class + '">' + "<i>Coming soon...</i>" + '</td>\
         </tr>';
     }
 
