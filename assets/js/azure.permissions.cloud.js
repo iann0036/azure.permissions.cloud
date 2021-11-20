@@ -327,8 +327,8 @@ async function processReferencePage() {
             var result_parts = results[i].split("/");
             var result_parts = results[i].split("/");
 
-            iam_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/iam/${result_parts[0]}#${results[i].replace(resouts_parts[0] + "/", "")}\">${results[i]}</a></li>`;
-            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${results[i].replace(resouts_parts[0] + "/", "")}\">${results[i]}</a></li>`;
+            iam_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/iam/${result_parts[0]}#${results[i].replace(result_parts[0] + "/", "")}\">${results[i]}</a></li>`;
+            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${results[i].replace(result_parts[0] + "/", "")}\">${results[i]}</a></li>`;
         };
         $('#search-iam-list').html(iam_html);
         $('#search-api-list').html(api_html);
