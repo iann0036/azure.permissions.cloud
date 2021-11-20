@@ -67,7 +67,7 @@ function processEffective(permissions, tableid, services) {
         console.log(permission);
 
         for (let action of permission['actions']) {
-            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            matchexpression = "^" + action.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".{1}") + "$";
             console.log(matchexpression);
             for (let service of services) {
                 for (let operation of service['operations']) {
@@ -90,7 +90,7 @@ function processEffective(permissions, tableid, services) {
         console.log(permitted_actions);
 
         for (let action of permission['dataActions']) {
-            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            matchexpression = "^" + action.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
@@ -105,7 +105,7 @@ function processEffective(permissions, tableid, services) {
         }
 
         for (let action of permission['notActions']) {
-            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            matchexpression = "^" + action.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
@@ -117,7 +117,7 @@ function processEffective(permissions, tableid, services) {
         }
 
         for (let action of permission['notDataActions']) {
-            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            matchexpression = "^" + action.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".{1}") + "$";
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
