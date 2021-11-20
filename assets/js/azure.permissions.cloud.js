@@ -57,6 +57,81 @@ function getQueryVariable(variable) {
     console.log('Query variable %s not found', variable);
 }
 
+function processEffective(permissions, tableid, services) {
+    var tbody = $(tableid + " tbody");
+    var permitted_actions = [];
+    var permitted_data_actions = [];
+    var table_content = '';
+
+    for (let permission of permissions) {
+        for (let action of permission['actions']) {
+            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            for (let service of services) {
+                for (let operation of service['operations']) {
+                    var re = new RegExp(matchexpression.toLowerCase());
+                    if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                        permitted_actions.push({
+                            'name': operation['name'],
+                            'based_on': action
+                        });
+                    }
+                }
+            }
+        }
+
+        for (let action of permission['dataActions']) {
+            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            for (let service of services) {
+                for (let operation of service['operations']) {
+                    var re = new RegExp(matchexpression.toLowerCase());
+                    if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                        permitted_data_actions.push({
+                            'name': operation['name'],
+                            'based_on': action
+                        });
+                    }
+                }
+            }
+        }
+
+        for (let action of permission['notActions']) {
+            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            for (let service of services) {
+                for (let operation of service['operations']) {
+                    var re = new RegExp(matchexpression.toLowerCase());
+                    if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                        permitted_actions = permitted_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                    }
+                }
+            }
+        }
+
+        for (let action of permission['notDataActions']) {
+            matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
+            for (let service of services) {
+                for (let operation of service['operations']) {
+                    var re = new RegExp(matchexpression.toLowerCase());
+                    if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                        permitted_data_actions = permitted_data_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                    }
+                }
+            }
+        }
+    }
+
+    for (let action of permitted_actions) {
+        var access_class = "tx-normal";
+
+        table_content += '<tr>\
+            <td class="tx-medium">' + action['name'] + '</td>\
+            <td class="tx-medium">' + action['based_on'] + '</td>\
+            <td class="' + access_class + '">' + "TBC" + '</td>\
+        </tr>';
+    }
+
+    tbody.html(table_content);
+}
+
 async function processReferencePage() {
     let services_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/provider-operations.json');
     let services = await services_data.json();
@@ -361,7 +436,7 @@ async function processReferencePage() {
         if (window.location.pathname.startsWith("/builtinroles/") && encodeURIComponent(builtinrole['name']).toLowerCase() == window.location.pathname.replace("/builtinroles/", "").toLowerCase()) {
             $('.builtinroleraw').html(Prism.highlight(JSON.stringify(builtinrole['rawPermissions'], null, 4), Prism.languages.javascript, 'javascript'));
             $('.builtinrolename').html(builtinrole['name']);
-            //processbuiltinrole(policy_data, iam_def);
+            processEffective(builtinrole['rawPermissions'], 'effectivepolicy-table', services);
             $('#builtinrole-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
         }
     }
@@ -385,7 +460,16 @@ async function processReferencePage() {
         $('.custompolicy').bind('input propertychange', function () {
             clearTimeout(custom_policy_timer);
             custom_policy_timer = setTimeout(function () {
-                //processCustomPolicy(iam_def);
+                try {
+                    var custompolicy = JSON.parse($('.custompolicy').html());
+
+                    processEffective([{
+                        'actions': custompolicy['Actions'],
+                        'notActions': custompolicy['NotActions'],
+                        'dataActions': custompolicy['DataActions'],
+                        'notDataActions': custompolicy['NotDataActions']
+                    }], 'customeffectivepolicy-table', services);
+                } catch(err) {}
             }, 800);
         });
     }
