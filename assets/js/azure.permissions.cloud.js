@@ -500,8 +500,6 @@ async function processReferencePage() {
         builtinroles_table_content += '<tr>\
             <td class="tx-medium"><a href="/builtinroles/' + builtinrole['name'] + '">' + builtinrole['name'] + "</a>" + (builtinrole['permittedActions'].length == 0 && builtinrole['permittedDataActions'].length == 0 ? ' <span class="badge badge-secondary">empty</span>' : '') + '</td>\
             <td class="tx-normal">' + builtinrole['description'] + '</td>\
-            <td class="tx-normal">' + builtinrole['permittedActions'].length + '</td>\
-            <td class="tx-normal">' + builtinrole['permittedDataActions'].length + '</td>\
         </tr>';
 
         if (window.location.pathname.startsWith("/builtinroles/") && encodeURIComponent(builtinrole['name']).toLowerCase() == window.location.pathname.replace("/builtinroles/", "").toLowerCase()) {
