@@ -552,7 +552,7 @@ async function processReferencePage() {
         }
 
         builtinroles_table_content += '<tr>\
-            <td class="tx-medium"><a href="/builtinroles/' + builtinrole['name'] + '">' + builtinrole['name'] + "</a>" + (builtinrole['hasUnknown'] ? ' <span class="badge badge-warning">unknown actions</span>' : '') + (!builtinrole['hasUnknown'] && builtinrole['permittedActions'].length == 0 && builtinrole['permittedDataActions'].length == 0 ? ' <span class="badge badge-secondary">empty</span>' : '') + '</td>\
+            <td class="tx-medium"><a href="/builtinroles/' + builtinrole['name'] + '">' + builtinrole['name'] + "</a>" + (builtinrole['hasUnknown'] ? ' <span class="badge badge-warning">unknown actions</span>' : '') + (builtinrole['hasExternal'] ? ' <span class="badge badge-info">external actions</span>' : '') + (!builtinrole['hasExternal'] && !builtinrole['hasUnknown'] && builtinrole['permittedActions'].length == 0 && builtinrole['permittedDataActions'].length == 0 ? ' <span class="badge badge-secondary">empty</span>' : '') + '</td>\
             <td class="tx-normal">' + builtinrole['description'] + '</td>\
         </tr>';
 
