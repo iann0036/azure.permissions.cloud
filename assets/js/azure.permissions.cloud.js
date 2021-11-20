@@ -64,21 +64,12 @@ function processEffective(permissions, tableid, services) {
     var table_content = '';
 
     for (let permission of permissions) {
-        console.log(permission);
-
         for (let action of permission['actions']) {
             matchexpression = "^" + action.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".{1}") + "$";
-            console.log(matchexpression);
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
-                    console.log("Is Data Action: " + operation['isDataAction']);
-                    console.log(operation['name'].toLowerCase());
-                    console.log(re);
-                    console.log(!operation['isDataAction']);
-                    console.log(operation['name'].toLowerCase().match(re));
                     if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
-                        console.log("HIT");
                         permitted_actions.push({
                             'name': operation['name'],
                             'based_on': action
@@ -87,7 +78,6 @@ function processEffective(permissions, tableid, services) {
                 }
             }
         }
-        console.log(permitted_actions);
 
         for (let action of permission['dataActions']) {
             matchexpression = "^" + action.replace(/\./g, "\\.").replace(/\*/g, ".*").replace(/\?/g, ".{1}") + "$";
@@ -131,9 +121,10 @@ function processEffective(permissions, tableid, services) {
 
     for (let action of permitted_actions) {
         var access_class = "tx-normal";
+        var action_name_parts = action['name'].split("/");
 
         table_content += '<tr>\
-            <td class="tx-medium">' + action['name'] + '</td>\
+            <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + '</td>\
             <td class="tx-medium">' + action['based_on'] + '</td>\
             <td class="' + access_class + '">' + "<i>Coming soon...</i>" + '</td>\
         </tr>';
