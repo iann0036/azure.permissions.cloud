@@ -357,7 +357,7 @@ async function processReferencePage() {
         </tr>';
 
         if (window.location.pathname.startsWith("/builtinroles/") && builtinrole['name'] == window.location.pathname.replace("/builtinroles/", "")) {
-            $('.builtinroleraw').html(Prism.highlight(JSON.stringify(policy_data['builtinrole'], null, 4), Prism.languages.javascript, 'javascript'));
+            $('.builtinroleraw').html(Prism.highlight(JSON.stringify(builtinrole['rawPermissions'], null, 4), Prism.languages.javascript, 'javascript'));
             $('.builtinrolename').html(builtinrole['name']);
             //processbuiltinrole(policy_data, iam_def);
             $('#builtinrole-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
