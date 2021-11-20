@@ -260,7 +260,7 @@ async function processReferencePage() {
     let services_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/provider-operations.json');
     let services = await services_data.json();
     let service = null;
-    
+
     let builtinroles_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
     let builtinroles = await builtinroles_data.json();
 
@@ -369,33 +369,6 @@ async function processReferencePage() {
             $('.navbar-search-header > input').trigger('input');
         }, 100);
     }
-    */
-
-    // resource type modal
-    /*
-    $('#resourceTypeModal').on('show.bs.modal', function (e) {
-        let offset = 1;
-        let rtdstart = "{";
-        let rtdend = "\n}";        
-        let tokens = $(e.relatedTarget).html().split(/(\[\]|\.)/g);
-        for (let token of tokens) {
-            if (token == "[]") {
-                rtdstart += "[\n" + "    ".repeat(offset + 1);
-                rtdend = "\n" + "    ".repeat(offset) + "]" + rtdend;
-                offset += 1;
-            } else if (token == ".") {
-                rtdstart += "{" + "    ".repeat(offset + 1);
-                rtdend = "\n" + "    ".repeat(offset) + "}" + rtdend;
-                offset += 1;
-            } else if (token == "") {
-                // nothing
-            } else {
-                rtdstart += "\n" + "    ".repeat(offset) + "\"" + token + "\": ";
-            }
-        }
-        rtdstart += "\"VALUE\",\n" + "    ".repeat(offset) + "...";
-        $('#resourceTypeDisplay').html(rtdstart + rtdend);
-    });
     */
 
     //
