@@ -306,48 +306,37 @@ async function processReferencePage() {
             $('.navbar-search-header > input').focus();
         }, 100);
     });
-
-    /*
+    
     $('.navbar-search-header > input').on('input', function(e){
         let searchterm = $('.navbar-search-header > input').val().toLowerCase();
 
-        // IAM
-        let html = '';
+        // IAM & API
+        let iam_html = '';
+        let api_html = '';
         let results = [];
-        for (let service of iam_def) {
-            for (let privilege of service['privileges']) {
-                let fullpriv = service['prefix'] + ":" + privilege['privilege'];
-                if (service['prefix'].toLowerCase().startsWith(searchterm) || privilege['privilege'].toLowerCase().startsWith(searchterm) || fullpriv.toLowerCase().startsWith(searchterm)) {
-                    results.push(fullpriv);
+        for (let searchservice of services) {
+            for (let searchoperation of searchservice['operations']) {
+                if (searchoperation['name'].toLowerCase().startsWith(searchterm)) {
+                    results.push(searchoperation['name']);
                 }
                 if (results.length >= 10) break;
             }
             if (results.length >= 10) break;
         }
         for (let i=0; i<results.length && i<10; i++) {
-            html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/iam/${results[i].split(":")[0]}#${results[i].replace(":", "-")}\">${results[i]}</a></li>`;
-        };
-        $('#search-iam-list').html(html);
+            var result_parts = resouts[i].split("/");
+            var result_parts = resouts[i].split("/");
 
-        // API
-        html = '';
-        results = [];
-        for (let iam_mapping_name of Object.keys(sdk_map['sdk_method_iam_mappings']).sort()) {
-            let split_name = iam_mapping_name.split(".");
-            if (split_name[0].toLowerCase().startsWith(searchterm) || split_name[1].toLowerCase().startsWith(searchterm) || iam_mapping_name.toLowerCase().startsWith(searchterm)) {
-                results.push(iam_mapping_name);
-            }
-            if (results.length >= 10) break;
-        }
-        for (let i=0; i<results.length && i<10; i++) {
-            html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${sdk_map['sdk_method_iam_mappings'][results[i]][0]['action'].split(":")[0]}#${results[i].replace(".", "_")}\">${results[i]}</a></li>`;
+            iam_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/iam/${result_parts[0]}#${results[i].replace(resouts_parts[0] + "/", "")}\">${results[i]}</a></li>`;
+            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${results[i].replace(resouts_parts[0] + "/", "")}\">${results[i]}</a></li>`;
         };
-        $('#search-api-list').html(html);
+        $('#search-iam-list').html(iam_html);
+        $('#search-api-list').html(api_html);
 
         // Managed Policies
         html = '';
         results = [];
-        for (let builtinrole of builtinroles['policies']) {
+        for (let builtinrole of builtinroles['roles']) {
             if (builtinrole['name'].toLowerCase().includes(searchterm)) {
                 results.push(builtinrole['name']);
             }
@@ -369,7 +358,6 @@ async function processReferencePage() {
             $('.navbar-search-header > input').trigger('input');
         }, 100);
     }
-    */
 
     //
     $('#body-dashboard').attr('style', 'display: none;');
