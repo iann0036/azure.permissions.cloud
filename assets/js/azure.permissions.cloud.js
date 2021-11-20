@@ -368,7 +368,7 @@ async function processReferencePage() {
 
     $('#builtinroles-table tbody').append(builtinroles_table_content);
 
-    $('.active-builtinroles-count').html(builtinroles['policies'].length - deprecated_policy_count);
+    $('.active-builtinroles-count').html(builtinroles['roles'].length - deprecated_policy_count);
     $('.deprecated-builtinroles-count').html(deprecated_policy_count);
 
     $('[data-toggle="tooltip"]').tooltip();
