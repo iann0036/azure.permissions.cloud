@@ -140,6 +140,25 @@ function processEffective(permissions, tableid, services) {
         </tr>';
     }
 
+    for (let action of permitted_data_actions) {
+        var access_class = "tx-normal";
+        var action_name_parts = action['name'].split("/");
+
+        let origins = [];
+        if (action['origin']) {
+            origins = action['origin'].split(",");
+            for (let i = 0; i < origins.length; i++) {
+                origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+            }
+        }
+
+        table_content += '<tr>\
+            <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + ' <span class="badge badge-primary">data action</span></td>\
+            <td class="tx-medium">' + action['based_on'] + '</td>\
+            <td class="tx-medium">' + origins.join(", ") + '</td>\
+        </tr>';
+    }
+
     tbody.html(table_content);
 }
 
