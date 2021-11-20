@@ -260,6 +260,9 @@ async function processReferencePage() {
     let services_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/provider-operations.json');
     let services = await services_data.json();
     let service = null;
+    
+    let builtinroles_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
+    let builtinroles = await builtinroles_data.json();
 
     $('#actions-table tbody').html('');
 
@@ -535,8 +538,6 @@ async function processReferencePage() {
 
     // built-in roles
     let builtinroles_table_content = '';
-    let builtinroles_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
-    let builtinroles = await builtinroles_data.json();
 
     builtinroles['roles'].sort(function (a, b) {
         if (a['name'] < b['name']) {
