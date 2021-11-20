@@ -383,7 +383,7 @@ async function processReferencePage() {
         $('.custompolicy').bind('input propertychange', function() {
             clearTimeout(custom_policy_timer);
             custom_policy_timer = setTimeout(function(){
-                processCustomPolicy(iam_def);
+                //processCustomPolicy(iam_def);
             }, 800);
         });
     }
