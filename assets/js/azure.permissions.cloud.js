@@ -449,15 +449,18 @@ async function processReferencePage() {
     $('[data-toggle="tooltip"]').tooltip();
 
     // Total counts
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
     total_ops = 0;
     for (let serviceitem of services) {
         for (let resource_type of serviceitem['resourceTypes']) {
             total_ops += resource_type['operations'].length;
         }
     }
-    $('.total-actions').html(total_ops);
-    $('.total-apimethods').html(total_ops);
-    $('.total-builtinroles').html(builtinroles['roles'].length);
+    $('.total-actions').html(numberWithCommas(total_ops));
+    $('.total-apimethods').html(numberWithCommas(total_ops));
+    $('.total-builtinroles').html(numberWithCommas(builtinroles['roles'].length));
 
     // scroll to hash
     if (window.location.hash != "") {
