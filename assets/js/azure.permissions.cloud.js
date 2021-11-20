@@ -72,7 +72,7 @@ function processEffective(permissions, tableid, services) {
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
-                    console.log("Is Data Action: " + string(operation['isDataAction']));
+                    console.log("Is Data Action: " + operation['isDataAction']);
                     console.log(operation['name'].toLowerCase());
                     if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                         permitted_actions.push({
@@ -111,7 +111,6 @@ function processEffective(permissions, tableid, services) {
                 }
             }
         }
-        console.log(permitted_actions);
 
         for (let action of permission['notDataActions']) {
             matchexpression = "^" + action.replace(/\*/g, ".*").replace(/\?/g, ".{1}").replace(/\./g, "\\.") + "$";
@@ -125,11 +124,6 @@ function processEffective(permissions, tableid, services) {
             }
         }
     }
-
-    permitted_actions.push({
-        "name": "Test",
-        "based_on": "testonly"
-    });
 
     for (let action of permitted_actions) {
         var access_class = "tx-normal";
