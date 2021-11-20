@@ -212,7 +212,7 @@ function processEffective(permissions, tableid, services) {
             }
 
             table_content += '<tr>\
-                <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + '</td>\
+                <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + (action['name'].toLowerCase().startsWith("microsoft.") ? '' : '<span class="badge badge-info">external action</span>') + '</td>\
                 <td class="tx-medium">' + action['based_on'] + '</td>\
                 <td class="tx-medium">' + origins.join(", ") + '</td>\
             </tr>';
