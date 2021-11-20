@@ -437,7 +437,7 @@ async function processReferencePage() {
         if (window.location.pathname.startsWith("/builtinroles/") && encodeURIComponent(builtinrole['name']).toLowerCase() == window.location.pathname.replace("/builtinroles/", "").toLowerCase()) {
             $('.builtinroleraw').html(Prism.highlight(JSON.stringify(builtinrole['rawPermissions'], null, 4), Prism.languages.javascript, 'javascript'));
             $('.builtinrolename').html(builtinrole['name']);
-            processEffective(builtinrole['rawPermissions'], 'effectivepolicy-table', services);
+            processEffective(builtinrole['rawPermissions'], '#effectivepolicy-table', services);
             $('#builtinrole-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
         }
     }
@@ -483,7 +483,7 @@ async function processReferencePage() {
                         'notActions': custompolicy['NotActions'],
                         'dataActions': custompolicy['DataActions'],
                         'notDataActions': custompolicy['NotDataActions']
-                    }], 'customeffectivepolicy-table', services);
+                    }], '#customeffectivepolicy-table', services);
                 } catch(err) {}
             }, 800);
         });
