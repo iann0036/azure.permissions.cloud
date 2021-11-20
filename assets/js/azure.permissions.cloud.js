@@ -557,6 +557,7 @@ async function processReferencePage() {
         </tr>';
 
         if (window.location.pathname.startsWith("/builtinroles/") && encodeURIComponent(builtinrole['name']).toLowerCase() == window.location.pathname.replace("/builtinroles/", "").toLowerCase()) {
+            $('#builtinroletags').html((builtinrole['hasUnknown'] ? ' <span class="badge badge-warning">unknown actions</span>' : '') + (builtinrole['hasExternal'] ? ' <span class="badge badge-info">external actions</span>' : '') + (!builtinrole['hasExternal'] && !builtinrole['hasUnknown'] && builtinrole['permittedActions'].length == 0 && builtinrole['permittedDataActions'].length == 0 ? ' <span class="badge badge-secondary">empty</span>' : ''));
             $('.builtinroleraw').html(Prism.highlight(JSON.stringify(builtinrole['rawPermissions'], null, 4), Prism.languages.javascript, 'javascript'));
             $('.builtinrolename').html(builtinrole['name']);
             processEffective(builtinrole['rawPermissions'], '#effectivepolicy-table', services);
