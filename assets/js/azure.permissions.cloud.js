@@ -240,7 +240,7 @@ function processEffective(permissions, tableid, services) {
             }
 
             table_content += '<tr>\
-                <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + ' <span class="badge badge-primary">data action</span></td>\
+                <td class="tx-medium"><span class="tx-color-03">' + action_name_parts.shift() + '/</span>' + action_name_parts.join("/") + (action['name'].toLowerCase().startsWith("microsoft.") ? '' : '<span class="badge badge-info">external action</span>') + ' <span class="badge badge-primary">data action</span></td>\
                 <td class="tx-medium">' + action['based_on'] + '</td>\
                 <td class="tx-medium">' + origins.join(", ") + '</td>\
             </tr>';
@@ -481,7 +481,7 @@ async function processReferencePage() {
             }
 
             actions_table_content += '<tr id="' + operation['name'] + '">\
-            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
+            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['name'].toLowerCase().startsWith("microsoft.") ? '' : ' <span class="badge badge-info">external action</span>') + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
             <td class="tx-normal">' + displayName + '</td>\
             <td class="tx-normal">' + description + '</td>\
             <td class="tx-medium">' + origins.join(", ") + '</td>\
