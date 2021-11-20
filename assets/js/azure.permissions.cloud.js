@@ -145,16 +145,16 @@ async function processReferencePage() {
         // Managed Policies
         html = '';
         results = [];
-        for (let managedpolicy of managedpolicies['policies']) {
-            if (managedpolicy['name'].toLowerCase().includes(searchterm)) {
-                results.push(managedpolicy['name']);
+        for (let builtinrole of builtinroles['policies']) {
+            if (builtinrole['name'].toLowerCase().includes(searchterm)) {
+                results.push(builtinrole['name']);
             }
             if (results.length >= 10) break;
         }
         for (let i=0; i<results.length && i<10; i++) {
-            html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/managedpolicies/${results[i]}\">${results[i]}</a></li>`;
+            html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/builtinroles/${results[i]}\">${results[i]}</a></li>`;
         };
-        $('#search-managedpolicies-list').html(html);
+        $('#search-builtinroles-list').html(html);
     });
 
     // omnibox search
@@ -331,13 +331,12 @@ async function processReferencePage() {
     $('.api-count').html(api_count.toString());
     $('#methods-table tbody').append(method_table_content);
 
-    // managed policies
-    /*
-    let managedpolicies_table_content = '';
-    let managedpolicies_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/managed_policies.json');
-    let managedpolicies = await managedpolicies_data.json();
+    // built-in roles
+    let builtinroles_table_content = '';
+    let builtinroles_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
+    let builtinroles = await builtinroles_data.json();
 
-    managedpolicies['policies'].sort(function(a, b) {
+    builtinroles['roles'].sort(function(a, b) {
         if (a['name'] < b['name']) {
             return -1;
         }
@@ -345,45 +344,44 @@ async function processReferencePage() {
     });
 
     let deprecated_policy_count = 0;
-    for (let managedpolicy of managedpolicies['policies']) {
-        if (managedpolicy['deprecated']) {
+    for (let builtinrole of builtinroles['roles']) {
+        if (builtinrole['deprecated']) {
             deprecated_policy_count += 1;
         }
 
-        for (let i=0; i<managedpolicy['access_levels'].length; i++) {
+        for (let i=0; i<builtinrole['access_levels'].length; i++) {
             let access_class = "tx-success";
-            if (["Write", "Permissions management"].includes(managedpolicy['access_levels'][i])) {
+            if (["Write", "Permissions management"].includes(builtinrole['access_levels'][i])) {
                 access_class = "tx-pink";
             }
-            if (["Unknown"].includes(managedpolicy['access_levels'][i])) {
+            if (["Unknown"].includes(builtinrole['access_levels'][i])) {
                 access_class = "tx-color-03";
             }
-            managedpolicy['access_levels'][i] = "<span class=\"" + access_class + "\">" + managedpolicy['access_levels'][i] + "</span>";
+            builtinrole['access_levels'][i] = "<span class=\"" + access_class + "\">" + builtinrole['access_levels'][i] + "</span>";
         }
 
-        managedpolicies_table_content += '<tr>\
-            <td class="tx-medium"><a href="/managedpolicies/' + managedpolicy['name'] + '">' + managedpolicy['name'] + "</a>" + (managedpolicy['resource_exposure'] ? ' <span class="badge badge-info">resource exposure</span>' : '') + (managedpolicy['credentials_exposure'] ? ' <span class="badge badge-info">credentials exposure</span>' : '') + (managedpolicy['unknown_actions'] ? ' <span class="badge badge-warning">unknown actions</span>' : '') + (managedpolicy['privesc'] ? ' <span class="badge badge-warning">possible privesc</span>' : '') + (managedpolicy['malformed'] ? ' <span class="badge badge-danger">malformed</span>' : '') + (managedpolicy['deprecated'] ? ' <span class="badge badge-danger">deprecated</span>' : '') + (managedpolicy['undocumented_actions'] ? ' <span class="badge badge-danger">undocumented actions</span>' : '') + '</td>\
-            <td class="tx-normal">' + managedpolicy['access_levels'].join(", ") + '</td>\
-            <td class="tx-normal">' + managedpolicy['version'] + '</td>\
-            <td class="tx-normal" style="text-decoration-line: underline; text-decoration-style: dotted;">' + readable_date(managedpolicy['createdate']) + '</td>\
-            <td class="tx-normal" style="text-decoration-line: underline; text-decoration-style: dotted;">' + readable_date(managedpolicy['updatedate']) + '</td>\
+        builtinroles_table_content += '<tr>\
+            <td class="tx-medium"><a href="/builtinroles/' + builtinrole['name'] + '">' + builtinrole['name'] + "</a>" + (builtinrole['resource_exposure'] ? ' <span class="badge badge-info">resource exposure</span>' : '') + (builtinrole['credentials_exposure'] ? ' <span class="badge badge-info">credentials exposure</span>' : '') + (builtinrole['unknown_actions'] ? ' <span class="badge badge-warning">unknown actions</span>' : '') + (builtinrole['privesc'] ? ' <span class="badge badge-warning">possible privesc</span>' : '') + (builtinrole['malformed'] ? ' <span class="badge badge-danger">malformed</span>' : '') + (builtinrole['deprecated'] ? ' <span class="badge badge-danger">deprecated</span>' : '') + (builtinrole['undocumented_actions'] ? ' <span class="badge badge-danger">undocumented actions</span>' : '') + '</td>\
+            <td class="tx-normal">' + builtinrole['access_levels'].join(", ") + '</td>\
+            <td class="tx-normal">' + builtinrole['version'] + '</td>\
+            <td class="tx-normal" style="text-decoration-line: underline; text-decoration-style: dotted;">' + readable_date(builtinrole['createdate']) + '</td>\
+            <td class="tx-normal" style="text-decoration-line: underline; text-decoration-style: dotted;">' + readable_date(builtinrole['updatedate']) + '</td>\
         </tr>';
 
-        if (window.location.pathname.startsWith("/builtinroles/") && managedpolicy['name'] == window.location.pathname.replace("/builtinroles/", "")) {
-            let policy = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/managedpolicies/' + managedpolicy['name'] + '.json');
+        if (window.location.pathname.startsWith("/builtinroles/") && builtinrole['name'] == window.location.pathname.replace("/builtinroles/", "")) {
+            let policy = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/builtinroles/' + builtinrole['name'] + '.json');
             let policy_data = await policy.json();
-            $('.managedpolicyraw').html(Prism.highlight(JSON.stringify(policy_data['document'], null, 4), Prism.languages.javascript, 'javascript'));
-            $('.managedpolicyname').html(managedpolicy['name']);
-            processManagedPolicy(policy_data, iam_def);
-            $('#managedpolicy-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/managedpolicies/' + managedpolicy['name'] + '.json');
+            $('.builtinroleraw').html(Prism.highlight(JSON.stringify(policy_data['document'], null, 4), Prism.languages.javascript, 'javascript'));
+            $('.builtinrolename').html(builtinrole['name']);
+            processbuiltinrole(policy_data, iam_def);
+            $('#builtinrole-json-link').attr('href', 'https://raw.githubusercontent.com/iann0036/iam-dataset/main/builtinroles/' + builtinrole['name'] + '.json');
         }
     }
 
-    $('#builtinroles-table tbody').append(managedpolicies_table_content);
+    $('#builtinroles-table tbody').append(builtinroles_table_content);
 
-    $('.active-builtinroles-count').html(managedpolicies['policies'].length - deprecated_policy_count);
+    $('.active-builtinroles-count').html(builtinroles['policies'].length - deprecated_policy_count);
     $('.deprecated-builtinroles-count').html(deprecated_policy_count);
-    */
 
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -395,7 +393,6 @@ async function processReferencePage() {
     }
 
     // policy evaluator
-    /*
     if (window.location.pathname.startsWith("/policyevaluator")) {
         $('.custompolicy').bind('input propertychange', function() {
             clearTimeout(custom_policy_timer);
@@ -404,7 +401,6 @@ async function processReferencePage() {
             }, 800);
         });
     }
-    */
 }
 
 processReferencePage();
