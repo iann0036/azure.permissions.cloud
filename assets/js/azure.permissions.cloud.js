@@ -256,6 +256,17 @@ function processEffective(permissions, tableid, services) {
     tbody.html(table_content);
 }
 
+function get_permission_level(name) {
+    if (name.toLowerCase().match(/\/list[a-zA-Z0-9]*$/g)) {
+        return "List";
+    } else if (name.toLowerCase().match(/\/(?:get|read|select)[a-zA-Z0-9]*$/g)) {
+        return "Read";
+    } else if (name.toLowerCase().match(/\/(?:write|set|action|create|update|add|remove|clone|copy|attach|detach|delete|cancel|resume|pause|reset|start|stop|suspend)[a-zA-Z0-9]*$/g)) {
+        return "Write";
+    }
+    return "Unknown";
+}
+
 async function processReferencePage() {
     let services_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/provider-operations.json');
     let services = await services_data.json();
@@ -436,6 +447,15 @@ async function processReferencePage() {
                 }
             }
 
+            let access_class = "tx-success";
+            let permission_level = get_permission_level(operation['name']);
+            if (["Write", "Permissions management"].includes(permission_level)) {
+                access_class = "tx-pink";
+            }
+            if (["Unknown"].includes(permission_level)) {
+                access_class = "tx-color-03";
+            }
+
             let origins = [];
             if (operation['origin']) {
                 origins = operation['origin'].split(",");
@@ -447,6 +467,7 @@ async function processReferencePage() {
             actions_table_content += '<tr id="' + operation['name'] + '">\
             <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['name'].toLowerCase().startsWith("microsoft.") ? '' : ' <span class="badge badge-info">external action</span>') + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
             <td class="tx-normal">' + displayName + '</td>\
+            <td class="' + access_class + '">' + permission_level + '</td>\
             <td class="tx-normal">' + description + '</td>\
             <td class="tx-medium">' + origins.join(", ") + '</td>\
         </tr>';
