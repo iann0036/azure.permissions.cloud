@@ -119,6 +119,11 @@ function processEffective(permissions, tableid, services) {
         }
     }
 
+    permittedActions.push({
+        "name": "Test",
+        "based_on": "testonly"
+    });
+
     for (let action of permitted_actions) {
         var access_class = "tx-normal";
 
