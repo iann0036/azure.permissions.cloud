@@ -74,7 +74,11 @@ function processEffective(permissions, tableid, services) {
                     var re = new RegExp(matchexpression.toLowerCase());
                     console.log("Is Data Action: " + operation['isDataAction']);
                     console.log(operation['name'].toLowerCase());
+                    console.log(re);
+                    console.log(!operation['isDataAction']);
+                    console.log(operation['name'].toLowerCase().match(re));
                     if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                        console.log("HIT");
                         permitted_actions.push({
                             'name': operation['name'],
                             'based_on': action
