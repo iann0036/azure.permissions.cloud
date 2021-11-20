@@ -37,7 +37,7 @@ function readable_date(str) {
         'December'
     ]
     let date = new Date(str);
-    
+
     return '<span data-toggle="tooltip" data-placement="top" title="' + str + '">' + date.getDate() + ' ' + months[date.getMonth()] + ', ' + date.getFullYear() + '</span>';
 }
 
@@ -76,7 +76,7 @@ async function processReferencePage() {
         }
         return 1;
     });
-    
+
     if ($('#reference-list').html() == "") {
         for (let service_def of services) {
             if (window.location.pathname == "/iam/" + service_def['name']) {
@@ -96,7 +96,7 @@ async function processReferencePage() {
     }
 
     // Search
-    $('#search-nav').on('click', function(e){
+    $('#search-nav').on('click', function (e) {
         e.preventDefault();
         $('.navbar-search').addClass('visible');
         $('.backdrop').addClass('show');
@@ -232,111 +232,113 @@ async function processReferencePage() {
         $('.display-api').attr('style', '');
     }
 
-    if (!service['displayName'] || service['displayName'] == "") {
-        $('.servicename').html(service['name']);
-    } else {
-        $('.servicename').html(service['displayName']);
-    }
-
-    $('.iam-link').click(() => {
-        window.location.pathname = window.location.pathname.replace("/api/", "/iam/");
-    });
-    $('.api-link').click(() => {
-        window.location.pathname = window.location.pathname.replace("/iam/", "/api/");
-    });
-
-    let operations = service['operations'];
-    for (let resource_type of service['resourceTypes']) {
-        for (let operation of resource_type['operations']) {
-            operation['resourceType'] = resource_type['name'];
-            operations.push(operation);
-        }
-    }
-
-    let actions_table_content = '';
-    let iam_count = 0;
-    for (let operation of operations) {
-        var operationname_parts = operation['name'].split("/");
-
-        let displayName = operation['displayName'].split(". ")[0];
-        if (displayName.endsWith(".")) {
-            displayName = displayName.substring(0, displayName.length-1);
+    if (service) {
+        if (!service['displayName'] || service['displayName'] == "") {
+            $('.servicename').html(service['name']);
+        } else {
+            $('.servicename').html(service['displayName']);
         }
 
-        let description = "";
-        if (operation['description']) {
-            description = operation['description'].split(". ")[0];
-            if (!description.endsWith(".")) {
-                description += ".";
+        $('.iam-link').click(() => {
+            window.location.pathname = window.location.pathname.replace("/api/", "/iam/");
+        });
+        $('.api-link').click(() => {
+            window.location.pathname = window.location.pathname.replace("/iam/", "/api/");
+        });
+
+        let operations = service['operations'];
+        for (let resource_type of service['resourceTypes']) {
+            for (let operation of resource_type['operations']) {
+                operation['resourceType'] = resource_type['name'];
+                operations.push(operation);
             }
         }
 
-        let origins = [];
-        if (operation['origin']) {
-            origins = operation['origin'].split(",");
-            for (let i=0; i<origins.length; i++) {
-                origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+        let actions_table_content = '';
+        let iam_count = 0;
+        for (let operation of operations) {
+            var operationname_parts = operation['name'].split("/");
+
+            let displayName = operation['displayName'].split(". ")[0];
+            if (displayName.endsWith(".")) {
+                displayName = displayName.substring(0, displayName.length - 1);
             }
-        }
-        
-        actions_table_content += '<tr id="' + operation['name'] + '">\
+
+            let description = "";
+            if (operation['description']) {
+                description = operation['description'].split(". ")[0];
+                if (!description.endsWith(".")) {
+                    description += ".";
+                }
+            }
+
+            let origins = [];
+            if (operation['origin']) {
+                origins = operation['origin'].split(",");
+                for (let i = 0; i < origins.length; i++) {
+                    origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+                }
+            }
+
+            actions_table_content += '<tr id="' + operation['name'] + '">\
             <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
             <td class="tx-normal">' + displayName + '</td>\
             <td class="tx-normal">' + description + '</td>\
             <td class="tx-medium">' + origins.join(", ") + '</td>\
         </tr>';
 
-        iam_count += 1;
-    }
-    $('.iam-count').html(iam_count);
-    $('#actions-table tbody').append(actions_table_content);
-
-    // api
-    let method_table_content = '';
-    let api_count = 0;
-    for (let operation of operations) {
-        var operationname_parts = operation['name'].split("/");
-
-        let displayName = operation['displayName'].split(". ")[0];
-        if (displayName.endsWith(".")) {
-            displayName = displayName.substring(0, displayName.length-1);
+            iam_count += 1;
         }
+        $('.iam-count').html(iam_count);
+        $('#actions-table tbody').append(actions_table_content);
 
-        let description = "";
-        if (operation['description']) {
-            description = operation['description'].split(". ")[0];
-            if (!description.endsWith(".")) {
-                description += ".";
+        // api
+        let method_table_content = '';
+        let api_count = 0;
+        for (let operation of operations) {
+            var operationname_parts = operation['name'].split("/");
+
+            let displayName = operation['displayName'].split(". ")[0];
+            if (displayName.endsWith(".")) {
+                displayName = displayName.substring(0, displayName.length - 1);
             }
-        }
 
-        let origins = [];
-        if (operation['origin']) {
-            origins = operation['origin'].split(",");
-            for (let i=0; i<origins.length; i++) {
-                origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+            let description = "";
+            if (operation['description']) {
+                description = operation['description'].split(". ")[0];
+                if (!description.endsWith(".")) {
+                    description += ".";
+                }
             }
-        }
-        
-        method_table_content += '<tr id="' + operation['name'] + '">\
+
+            let origins = [];
+            if (operation['origin']) {
+                origins = operation['origin'].split(",");
+                for (let i = 0; i < origins.length; i++) {
+                    origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
+                }
+            }
+
+            method_table_content += '<tr id="' + operation['name'] + '">\
             <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
             <td class="tx-normal">' + displayName + '</td>\
             <td class="tx-normal">' + description + '</td>\
             <td class="tx-medium">' + origins.join(", ") + '</td>\
         </tr>';
 
-        api_count += 1;
-    }
+            api_count += 1;
+        }
 
-    $('.api-count').html(api_count.toString());
-    $('#methods-table tbody').append(method_table_content);
+        $('.api-count').html(api_count.toString());
+        $('#methods-table tbody').append(method_table_content);
+    }
 
     // built-in roles
     let builtinroles_table_content = '';
     let builtinroles_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
     let builtinroles = await builtinroles_data.json();
 
-    builtinroles['roles'].sort(function(a, b) {
+    builtinroles['roles'].sort(function (a, b) {
         if (a['name'] < b['name']) {
             return -1;
         }
@@ -375,14 +377,14 @@ async function processReferencePage() {
     if (window.location.hash != "") {
         try {
             $('.content-body').scrollTop($(window.location.hash).offset().top - $('.content-header').height() + 1);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     // policy evaluator
     if (window.location.pathname.startsWith("/policyevaluator")) {
-        $('.custompolicy').bind('input propertychange', function() {
+        $('.custompolicy').bind('input propertychange', function () {
             clearTimeout(custom_policy_timer);
-            custom_policy_timer = setTimeout(function(){
+            custom_policy_timer = setTimeout(function () {
                 //processCustomPolicy(iam_def);
             }, 800);
         });
