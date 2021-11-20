@@ -69,16 +69,24 @@ function processEffective(permissions, tableid, services) {
             for (let service of services) {
                 for (let operation of service['operations']) {
                     var re = new RegExp(matchexpression.toLowerCase());
-                    console.log(matchexpression);
-                    console.log(re);
-                    console.log(operation['name'].toLowerCase());
-                    console.log("---");
                     if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                         permitted_actions.push({
                             'name': operation['name'],
                             'based_on': action,
                             'origin': operation['origin']
                         });
+                    }
+                }
+                for (let resource_type of service['resourceTypes']) {
+                    for (let operation of resource_type['operations']) {
+                        var re = new RegExp(matchexpression.toLowerCase());
+                        if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                            permitted_actions.push({
+                                'name': operation['name'],
+                                'based_on': action,
+                                'origin': operation['origin']
+                            });
+                        }
                     }
                 }
             }
@@ -97,6 +105,18 @@ function processEffective(permissions, tableid, services) {
                         });
                     }
                 }
+                for (let resource_type of service['resourceTypes']) {
+                    for (let operation of resource_type['operations']) {
+                        var re = new RegExp(matchexpression.toLowerCase());
+                        if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                            permitted_data_actions.push({
+                                'name': operation['name'],
+                                'based_on': action,
+                                'origin': operation['origin']
+                            });
+                        }
+                    }
+                }
             }
         }
 
@@ -109,6 +129,14 @@ function processEffective(permissions, tableid, services) {
                         permitted_actions = permitted_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
                     }
                 }
+                for (let resource_type of service['resourceTypes']) {
+                    for (let operation of resource_type['operations']) {
+                        var re = new RegExp(matchexpression.toLowerCase());
+                        if (!operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                            permitted_actions = permitted_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                        }
+                    }
+                }
             }
         }
 
@@ -119,6 +147,14 @@ function processEffective(permissions, tableid, services) {
                     var re = new RegExp(matchexpression.toLowerCase());
                     if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
                         permitted_data_actions = permitted_data_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                    }
+                }
+                for (let resource_type of service['resourceTypes']) {
+                    for (let operation of resource_type['operations']) {
+                        var re = new RegExp(matchexpression.toLowerCase());
+                        if (operation['isDataAction'] && operation['name'].toLowerCase().match(re)) {
+                            permitted_data_actions = permitted_data_actions.filter(x => x['name'].toLowerCase() != operation['name'].toLowerCase());
+                        }
                     }
                 }
             }
@@ -489,6 +525,7 @@ async function processReferencePage() {
     }
     total_ops = 0;
     for (let serviceitem of services) {
+        total_ops += serviceitem['operations'].length;
         for (let resource_type of serviceitem['resourceTypes']) {
             total_ops += resource_type['operations'].length;
         }
