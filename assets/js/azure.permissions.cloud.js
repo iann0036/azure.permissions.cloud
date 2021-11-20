@@ -358,7 +358,7 @@ async function processReferencePage() {
             <td class="tx-normal">' + builtinrole['permittedDataActions'].length + '</td>\
         </tr>';
 
-        if (window.location.pathname.startsWith("/builtinroles/") && builtinrole['name'] == window.location.pathname.replace("/builtinroles/", "")) {
+        if (window.location.pathname.startsWith("/builtinroles/") && encodeURIComponent(builtinrole['name']) == window.location.pathname.replace("/builtinroles/", "")) {
             $('.builtinroleraw').html(Prism.highlight(JSON.stringify(builtinrole['rawPermissions'], null, 4), Prism.languages.javascript, 'javascript'));
             $('.builtinrolename').html(builtinrole['name']);
             //processbuiltinrole(policy_data, iam_def);
