@@ -119,7 +119,7 @@ function processEffective(permissions, tableid, services) {
         }
     }
 
-    permittedActions.push({
+    permitted_actions.push({
         "name": "Test",
         "based_on": "testonly"
     });
