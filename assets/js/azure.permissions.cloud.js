@@ -595,6 +595,10 @@ async function processReferencePage() {
             }, 800);
         });
     }
+
+    $(() => {
+        $(".table-responsive").floatingScroll();
+    });    
 }
 
 processReferencePage();
