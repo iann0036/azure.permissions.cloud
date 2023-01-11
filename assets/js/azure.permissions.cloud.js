@@ -434,9 +434,12 @@ async function processReferencePage() {
         for (let operation of operations) {
             var operationname_parts = operation['name'].split("/");
 
-            let displayName = operation['displayName'].split(". ")[0];
-            if (displayName.endsWith(".")) {
-                displayName = displayName.substring(0, displayName.length - 1);
+            let displayName = "Unknown"
+            if (operation['displayName'].includes(". ")) {
+                displayName = operation['displayName'].split(". ")[0];
+                if (displayName.endsWith(".")) {
+                    displayName = displayName.substring(0, displayName.length - 1);
+                }
             }
 
             let description = "";
