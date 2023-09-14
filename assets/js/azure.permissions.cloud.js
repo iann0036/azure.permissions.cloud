@@ -358,7 +358,7 @@ async function processReferencePage() {
         for (let i=0; i<api_results.length && i<10; i++) {
             var result_parts = api_results[i].split("/");
 
-            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${iam_results[i].replace(result_parts[0] + "/", "")}\">${iam_results[i]}</a></li>`;
+            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${api_results[i].replace(result_parts[0] + "/", "")}\">${api_results[i]}</a></li>`;
         };
         $('#search-iam-list').html(iam_html);
         $('#search-api-list').html(api_html);
