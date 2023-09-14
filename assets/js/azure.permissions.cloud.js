@@ -295,11 +295,11 @@ async function processReferencePage() {
 
     if ($('#reference-list').html() == "") {
         for (let service_def of services) {
-            if (window.location.pathname == "/iam/" + service_def['name']) {
+            if (window.location.pathname.toLowerCase() == "/iam/" + service_def['name'].toLowerCase()) {
                 service = service_def;
 
                 $('#reference-list').append('<li class="nav-item active"><a href="/iam/' + service_def['name'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
-            } else if (window.location.pathname == "/api/" + service_def['name']) {
+            } else if (window.location.pathname.toLowerCase() == "/api/" + service_def['name'].toLowerCase()) {
                 service = service_def;
 
                 $('#reference-list').append('<li class="nav-item active"><a href="/api/' + service_def['name'] + '" class="nav-link"><span>' + service_def['displayName'] + '</span></a></li>');
@@ -327,22 +327,38 @@ async function processReferencePage() {
         // IAM & API
         let iam_html = '';
         let api_html = '';
-        let results = [];
+        let iam_results = [];
+        let api_results = [];
         for (let searchservice of services) {
             for (let searchoperation of searchservice['operations']) {
                 if (searchoperation['name'].toLowerCase().startsWith(searchterm)) {
-                    results.push(searchoperation['name']);
+                    iam_results.push(searchoperation['name']);
                 }
-                if (results.length >= 10) break;
+                if (iam_results.length >= 10) break;
             }
-            if (results.length >= 10) break;
+            if (iam_results.length >= 10) break;
         }
-        for (let i=0; i<results.length && i<10; i++) {
-            var result_parts = results[i].split("/");
-            var result_parts = results[i].split("/");
+        for (let apibasename of Object.keys(apis)) {
+            for (let httpmethodname of Object.keys(apis[apibasename])) {
+                for (let pathname of Object.keys(apis[apibasename][httpmethodname])) {
+                    var aggname = apibasename + "/" + method['operationId'];
+                    if (aggname.toLowerCase().startsWith(searchterm) || method['operationId'].toLowerCase().startsWith(searchterm)) {
+                        api_results.push(aggname);
+                    }
+                }
+                if (api_results.length >= 10) break;
+            }
+            if (api_results.length >= 10) break;
+        }
+        for (let i=0; i<iam_results.length && i<10; i++) {
+            var result_parts = iam_results[i].split("/");
 
-            iam_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/iam/${result_parts[0]}#${results[i].replace(result_parts[0] + "/", "")}\">${results[i]}</a></li>`;
-            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${results[i].replace(result_parts[0] + "/", "")}\">${results[i]}</a></li>`;
+            iam_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/iam/${result_parts[0]}#${iam_results[i].replace(result_parts[0] + "/", "")}\">${iam_results[i]}</a></li>`;
+        };
+        for (let i=0; i<api_results.length && i<10; i++) {
+            var result_parts = api_results[i].split("/");
+
+            api_html += `<li style=\"margin-left: 5px; margin-top: 5px;\"><a href=\"/api/${result_parts[0]}#${iam_results[i].replace(result_parts[0] + "/", "")}\">${iam_results[i]}</a></li>`;
         };
         $('#search-iam-list').html(iam_html);
         $('#search-api-list').html(api_html);
