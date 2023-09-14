@@ -275,6 +275,9 @@ async function processReferencePage() {
     let builtinroles_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/built-in-roles.json');
     let builtinroles = await builtinroles_data.json();
 
+    let apis_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/api.json');
+    let apis = await apis_data.json();
+
     $('#actions-table tbody').html('');
 
     services.sort((a, b) => {
@@ -483,41 +486,24 @@ async function processReferencePage() {
         // api
         let method_table_content = '';
         let api_count = 0;
-        for (let operation of operations) {
-            var operationname_parts = operation['name'].split("/");
 
-            let displayName = "";
-            if (operation['displayName']) {
-                operation['displayName'].split(". ")[0];
-                if (displayName.endsWith(".")) {
-                    displayName = displayName.substring(0, displayName.length - 1);
+        for (let apibasename of Object.keys(apis)) {
+            if (apibasename == service['name'] || apibasename.startsWith(service['name'] + ".")) {
+                for (let httpmethodname of Object.keys(apis[apibasename])) {
+                    for (let pathname of Object.keys(apis[apibasename][httpmethodname])) {
+                        var method = apis[apibasename][httpmethodname][pathname];
+
+                        method_table_content += '<tr id="' + method['operationId'] + '">\
+                        <td class="tx-medium"><span class="tx-color-03">' + apibasename + '/</span>' + method['operationId'] + '</td>\
+                        <td class="tx-normal">' + httpmethodname.toUpperCase() + " " + pathname + '</td>\
+                        <td class="tx-normal">' + method['description'] + '</td>\
+                        <td class="tx-medium">' + method['versions'].join(", ") + '</td>\
+                    </tr>';
+
+                        api_count += 1;
+                    }
                 }
             }
-
-            let description = "";
-            if (operation['description']) {
-                description = operation['description'].split(". ")[0];
-                if (!description.endsWith(".")) {
-                    description += ".";
-                }
-            }
-
-            let origins = [];
-            if (operation['origin']) {
-                origins = operation['origin'].split(",");
-                for (let i = 0; i < origins.length; i++) {
-                    origins[i] = origins[i][0].toUpperCase() + origins[i].substr(1);
-                }
-            }
-
-            method_table_content += '<tr id="' + operation['name'] + '">\
-            <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
-            <td class="tx-normal">' + displayName + '</td>\
-            <td class="tx-normal">' + description + '</td>\
-            <td class="tx-medium">' + origins.join(", ") + '</td>\
-        </tr>';
-
-            api_count += 1;
         }
 
         $('.api-count').html(api_count.toString());
@@ -572,8 +558,18 @@ async function processReferencePage() {
             total_ops += resource_type['operations'].length;
         }
     }
+
+    var total_apimethods = 0;
+    for (let apibasename of Object.keys(apis)) {
+        for (let httpmethodname of Object.keys(apis[apibasename])) {
+            for (let pathname of Object.keys(apis[apibasename][httpmethodname])) {
+                total_apimethods += 1;
+            }
+        }
+    }
+
     $('.total-actions').html(numberWithCommas(total_ops));
-    $('.total-apimethods').html(numberWithCommas(total_ops));
+    $('.total-apimethods').html(numberWithCommas(total_apimethods));
     $('.total-builtinroles').html(numberWithCommas(builtinroles['roles'].length));
 
     // scroll to hash
