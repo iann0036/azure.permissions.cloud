@@ -488,7 +488,7 @@ async function processReferencePage() {
         let api_count = 0;
 
         for (let apibasename of Object.keys(apis)) {
-            if (apibasename == service['name'] || apibasename.startsWith(service['name'] + ".")) {
+            if (apibasename.toLowerCase() == service['name'].toLowerCase() || apibasename.startsWith(service['name'] + ".")) {
                 for (let httpmethodname of Object.keys(apis[apibasename])) {
                     for (let pathname of Object.keys(apis[apibasename][httpmethodname])) {
                         var method = apis[apibasename][httpmethodname][pathname];
