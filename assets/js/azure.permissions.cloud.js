@@ -489,9 +489,28 @@ async function processReferencePage() {
                 }
             }
 
+            var associatedmethods = [];
+            for (var httpmethod of Object.keys(map)) {
+                for (var pathname of Object.keys(map[httpmethod])) {
+                    for (var perm of Object.keys(map[httpmethod][pathname])) {
+                        if (perm.toLowerCase() == operation['name'].toLowerCase()) {
+                            for (let apibasename of Object.keys(apis)) {
+                                if (api[basename][httpmethod.toLowerCase()] && api[basename][httpmethod.toLowerCase()][pathname] && api[basename][httpmethod.toLowerCase()][pathname]['operationId']) {
+                                    var associatedmethod = api[basename][httpmethod.toLowerCase()][pathname]['operationId'];
+                                    associatedmethods.push("<a href=\"https://azure.permissions.cloud/api/" + apibasename + "#" + associatedmethod + "\">" + associatedmethod + "</a>");
+                                    break;
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+
             actions_table_content += '<tr id="' + operation['name'] + '">\
             <td class="tx-medium"><span class="tx-color-03">' + operationname_parts.shift() + '/</span>' + operationname_parts.join("/") + (operation['name'].toLowerCase().startsWith("microsoft.") ? '' : ' <span class="badge badge-info">external action</span>') + (operation['isDataAction'] ? ' <span class="badge badge-primary">data action</span>' : "") + '</td>\
             <td class="tx-normal">' + displayName + '</td>\
+            <td class="tx-medium">' + associatedmethods.join("<br />") + '</td>\
             <td class="' + access_class + '">' + permission_level + '</td>\
             <td class="tx-normal">' + description + '</td>\
             <td class="tx-medium">' + origins.join(", ") + '</td>\
@@ -524,8 +543,8 @@ async function processReferencePage() {
                         <td class="tx-medium"><span class="tx-color-03">' + apibasename + '/</span>' + method['operationId'] + '</td>\
                         <td class="tx-normal">' + httpmethodname.toUpperCase() + " " + pathname + '</td>\
                         <td class="tx-normal">' + method['description'] + '</td>\
-                        <td class="tx-medium">' + method['versions'].join(", ") + '</td>\
                         <td class="tx-medium">' + associatedperms.join("<br />") + '</td>\
+                        <td class="tx-medium">' + method['versions'].join(", ") + '</td>\
                     </tr>';
 
                         api_count += 1;
