@@ -514,7 +514,7 @@ async function processReferencePage() {
 
                         var associatedperms = [];
                         if (map[httpmethodname.toUpperCase()] && map[httpmethodname.toUpperCase()][pathname]) {
-                            for (var associatedperm of Object.keys(map[httpmethodname.toUpperCase()][pathname]) {
+                            for (var associatedperm of Object.keys(map[httpmethodname.toUpperCase()][pathname])) {
                                 associatedperms.push(associatedperm);
                             }
                         }
