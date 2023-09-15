@@ -541,9 +541,9 @@ async function processReferencePage() {
 
                         method_table_content += '<tr id="' + method['operationId'] + '">\
                         <td class="tx-medium"><span class="tx-color-03">' + apibasename + '/</span>' + method['operationId'] + '</td>\
-                        <td class="tx-normal">' + httpmethodname.toUpperCase() + " " + pathname + '</td>\
                         <td class="tx-normal">' + method['description'] + '</td>\
                         <td class="tx-medium">' + associatedperms.join("<br />") + '</td>\
+                        <td class="tx-normal">' + httpmethodname.toUpperCase() + " " + pathname + '</td>\
                         <td class="tx-medium">' + method['versions'].join(", ") + '</td>\
                     </tr>';
 
