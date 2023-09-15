@@ -497,7 +497,7 @@ async function processReferencePage() {
                             for (let apibasename of Object.keys(apis)) {
                                 if (apis[apibasename][httpmethod.toLowerCase()] && apis[apibasename][httpmethod.toLowerCase()][pathname] && apis[apibasename][httpmethod.toLowerCase()][pathname]['operationId']) {
                                     var associatedmethod = apis[apibasename][httpmethod.toLowerCase()][pathname]['operationId'];
-                                    associatedmethods.push("<a href=\"https://azure.permissions.cloud/api/" + apibasename + "#" + associatedmethod + "\">" + associatedmethod + "</a>");
+                                    associatedmethods.push("<a href=\"https://azure.permissions.cloud/api/" + apibasename + "#" + associatedmethod + "\">" + apibasename + "/" + associatedmethod + "</a>");
                                     break;
                                 }
                             }
