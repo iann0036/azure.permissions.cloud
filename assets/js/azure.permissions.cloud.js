@@ -515,7 +515,8 @@ async function processReferencePage() {
                         var associatedperms = [];
                         if (map[httpmethodname.toUpperCase()] && map[httpmethodname.toUpperCase()][pathname]) {
                             for (var associatedperm of Object.keys(map[httpmethodname.toUpperCase()][pathname])) {
-                                associatedperms.push(associatedperm);
+                                var prefix = associatedperm.split("/")[0];
+                                associatedperms.push("<a href=\"https://azure.permissions.cloud/iam/" + prefix + "#" + associatedperm.removeprefix(prefix + "/") + "\">" + associatedperm + "</a>");
                             }
                         }
 
