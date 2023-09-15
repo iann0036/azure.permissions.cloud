@@ -536,7 +536,7 @@ async function processReferencePage() {
                             for (var associatedperm of Object.keys(map[httpmethodname.toUpperCase()][pathname])) {
                                 var prefix = associatedperm.split("/")[0];
                                 var html = "<a href=\"https://azure.permissions.cloud/iam/" + prefix + "#" + associatedperm + "\">" + associatedperm + "</a>";
-                                if (map[httpmethodname.toUpperCase()][pathname]['condition']) {
+                                if (map[httpmethodname.toUpperCase()][pathname][associatedperm]['condition']) {
                                     html += " <span class=\"badge badge-info\">conditional</span>";
                                 }
                                 associatedperms.push(html);
