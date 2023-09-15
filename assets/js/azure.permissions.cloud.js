@@ -278,6 +278,9 @@ async function processReferencePage() {
     let apis_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/api.json');
     let apis = await apis_data.json();
 
+    let map_data = await fetch('https://raw.githubusercontent.com/iann0036/iam-dataset/main/azure/map.json');
+    let map = await map_data.json();
+
     $('#actions-table tbody').html('');
 
     services.sort((a, b) => {
@@ -509,11 +512,19 @@ async function processReferencePage() {
                     for (let pathname of Object.keys(apis[apibasename][httpmethodname])) {
                         var method = apis[apibasename][httpmethodname][pathname];
 
+                        var associatedperms = [];
+                        if (map[httpmethodname.toUpperCase()] && map[httpmethodname.toUpperCase()][pathname]) {
+                            for (var associatedperm of Object.keys(map[httpmethodname.toUpperCase()][pathname]) {
+                                associatedperms.push(associatedperm);
+                            }
+                        }
+
                         method_table_content += '<tr id="' + method['operationId'] + '">\
                         <td class="tx-medium"><span class="tx-color-03">' + apibasename + '/</span>' + method['operationId'] + '</td>\
                         <td class="tx-normal">' + httpmethodname.toUpperCase() + " " + pathname + '</td>\
                         <td class="tx-normal">' + method['description'] + '</td>\
                         <td class="tx-medium">' + method['versions'].join(", ") + '</td>\
+                        <td class="tx-medium">' + associatedperms.join("<br />") + '</td>\
                     </tr>';
 
                         api_count += 1;
