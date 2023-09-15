@@ -535,7 +535,11 @@ async function processReferencePage() {
                         if (map[httpmethodname.toUpperCase()] && map[httpmethodname.toUpperCase()][pathname]) {
                             for (var associatedperm of Object.keys(map[httpmethodname.toUpperCase()][pathname])) {
                                 var prefix = associatedperm.split("/")[0];
-                                associatedperms.push("<a href=\"https://azure.permissions.cloud/iam/" + prefix + "#" + associatedperm + "\">" + associatedperm + "</a>");
+                                var html = "<a href=\"https://azure.permissions.cloud/iam/" + prefix + "#" + associatedperm + "\">" + associatedperm + "</a>";
+                                if (map[httpmethodname.toUpperCase()][pathname]['condition']) {
+                                    html += " <span class=\"badge badge-info\">conditional</span>";
+                                }
+                                associatedperms.push(html);
                             }
                         }
 
