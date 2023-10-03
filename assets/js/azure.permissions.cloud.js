@@ -366,6 +366,7 @@ async function processReferencePage() {
         for (let apibasename of Object.keys(apis)) {
             for (let httpmethodname of Object.keys(apis[apibasename])) {
                 for (let pathname of Object.keys(apis[apibasename][httpmethodname])) {
+                    var method = apis[apibasename][httpmethodname][pathname];
                     var aggname = apibasename + "/" + method['operationId'];
                     if (aggname.toLowerCase().startsWith(searchterm) || method['operationId'].toLowerCase().startsWith(searchterm)) {
                         api_results.push(aggname);
